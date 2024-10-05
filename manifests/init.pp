@@ -40,6 +40,8 @@
 #   The maximum number of replication workers in job service
 #   Defaults to 10
 #
+# @param job_logger
+#
 # @param logger_sweeper_duration
 #   The jobLogger sweeper duration
 #   Defaults to 1 (days)
@@ -144,6 +146,10 @@
 #
 # @param redis_trivy_db_index
 #
+# @param redis_harbor_db_index
+#
+# @param redis_cache_layer_db_index
+#
 # @param trivy_ignore_unfixed
 #
 # @param trivy_skip_update
@@ -151,6 +157,8 @@
 # @param trivy_offline_scan
 #
 # @param trivy_insecure
+#
+# @param trivy_timeout
 #
 # @param trivy_github_token
 #
@@ -189,6 +197,8 @@
 #
 # @param cache_expire_hours
 #
+# @param quota_update_provider
+#
 # @param backup_enabled
 #   Specifies whether to create a backup tar file of the Harbor database if an upgrade is detected
 #   Defaults to false
@@ -207,6 +217,7 @@ class harbor (
   Stdlib::Host $hostname,
   Enum['http','https'] $ui_url_protocol,
   Integer $max_job_workers,
+  Enum['STD_OUTPUT', 'FILE', 'DB'] $job_logger,
   Integer $logger_sweeper_duration,
   Enum['on','off'] $customize_crt,
   Stdlib::Absolutepath $ssl_cert,
@@ -241,10 +252,13 @@ class harbor (
   Integer $redis_registry_db_index,
   Integer $redis_jobservice_db_index,
   Integer $redis_trivy_db_index,
+  Optional[Integer] $redis_harbor_db_index,
+  Optional[Integer] $redis_cache_layer_db_index,
   Boolean $trivy_ignore_unfixed,
   Boolean $trivy_skip_update,
   Boolean $trivy_offline_scan,
   Boolean $trivy_insecure,
+  String $trivy_timeout,
   String $uaa_ca_cert,
   Enum['filesystem','s3','gcs','azure','swift','oss'] $registry_storage_provider_name,
   String $registry_storage_provider_config,
@@ -261,6 +275,7 @@ class harbor (
   Boolean $upload_purging_dryrun,
   Boolean $cache_enabled,
   Integer $cache_expire_hours,
+  Enum['db', 'redis'] $quota_update_provider,
   Boolean $backup_enabled,
   Stdlib::Absolutepath $backup_directory,
   Optional[String] $trivy_github_token = undef,
@@ -328,6 +343,7 @@ class harbor (
     hostname                         => $hostname,
     ui_url_protocol                  => $ui_url_protocol,
     max_job_workers                  => $max_job_workers,
+    job_logger                       => $job_logger,
     logger_sweeper_duration          => $logger_sweeper_duration,
     customize_crt                    => $customize_crt,
     ssl_cert                         => $ssl_cert,
@@ -362,10 +378,13 @@ class harbor (
     redis_registry_db_index          => $redis_registry_db_index,
     redis_jobservice_db_index        => $redis_jobservice_db_index,
     redis_trivy_db_index             => $redis_trivy_db_index,
+    redis_harbor_db_index            => $redis_harbor_db_index,
+    redis_cache_layer_db_index       => $redis_cache_layer_db_index,
     trivy_ignore_unfixed             => $trivy_ignore_unfixed,
     trivy_skip_update                => $trivy_skip_update,
     trivy_offline_scan               => $trivy_offline_scan,
     trivy_insecure                   => $trivy_insecure,
+    trivy_timeout                    => $trivy_timeout,
     trivy_github_token               => $trivy_github_token,
     uaa_ca_cert                      => $uaa_ca_cert,
     registry_storage_provider_name   => $registry_storage_provider_name,
@@ -383,6 +402,7 @@ class harbor (
     upload_purging_dryrun            => $upload_purging_dryrun,
     cache_enabled                    => $cache_enabled,
     cache_expire_hours               => $cache_expire_hours,
+    quota_update_provider            => $quota_update_provider,
   }
   contain 'harbor::config'
 

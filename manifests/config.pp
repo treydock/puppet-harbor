@@ -5,6 +5,7 @@ class harbor::config (
   $hostname,
   $ui_url_protocol,
   $max_job_workers,
+  $job_logger,
   $logger_sweeper_duration,
   $customize_crt,
   $ssl_cert,
@@ -39,10 +40,13 @@ class harbor::config (
   $redis_registry_db_index,
   $redis_jobservice_db_index,
   $redis_trivy_db_index,
+  $redis_harbor_db_index,
+  $redis_cache_layer_db_index,
   $trivy_ignore_unfixed,
   $trivy_skip_update,
   $trivy_offline_scan,
   $trivy_insecure,
+  $trivy_timeout,
   $trivy_github_token,
   $uaa_ca_cert,
   $registry_storage_provider_name,
@@ -60,6 +64,7 @@ class harbor::config (
   $upload_purging_dryrun,
   $cache_enabled,
   $cache_expire_hours,
+  $quota_update_provider,
 ){
 
   assert_private()
@@ -69,6 +74,7 @@ class harbor::config (
     'hostname'                         => $hostname,
     'ui_url_protocol'                  => $ui_url_protocol,
     'max_job_workers'                  => $max_job_workers,
+    'job_logger'                       => $job_logger,
     'logger_sweeper_duration'          => $logger_sweeper_duration,
     'customize_crt'                    => $customize_crt,
     'ssl_cert'                         => $ssl_cert,
@@ -97,6 +103,7 @@ class harbor::config (
     'trivy_skip_update'                => $trivy_skip_update,
     'trivy_offline_scan'               => $trivy_offline_scan,
     'trivy_insecure'                   => $trivy_insecure,
+    'trivy_timeout'                    => $trivy_timeout,
     'trivy_github_token'               => $trivy_github_token,
     'uaa_ca_cert'                      => $uaa_ca_cert,
     'registry_storage_provider_name'   => $registry_storage_provider_name,
@@ -114,6 +121,8 @@ class harbor::config (
     'redis_registry_db_index'          => $redis_registry_db_index,
     'redis_jobservice_db_index'        => $redis_jobservice_db_index,
     'redis_trivy_db_index'             => $redis_trivy_db_index,
+    'redis_harbor_db_index'            => $redis_harbor_db_index,
+    'redis_cache_layer_db_index'       => $redis_cache_layer_db_index,
     'webhook_job_max_retry'            => $webhook_job_max_retry,
     'metrics'                          => $metrics,
     'metrics_port'                     => $metrics_port,
@@ -124,6 +133,7 @@ class harbor::config (
     'upload_purging_dryrun'            => $upload_purging_dryrun,
     'cache_enabled'                    => $cache_enabled,
     'cache_expire_hours'               => $cache_expire_hours,
+    'quota_update_provider'            => $quota_update_provider,
   }
 
   file { '/opt/harbor/harbor.yml':

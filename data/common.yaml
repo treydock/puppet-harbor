@@ -8,6 +8,9 @@ harbor::with_trivy: false
 harbor::hostname: "%{facts.fqdn}"
 harbor::ui_url_protocol: 'http'
 harbor::max_job_workers: 10
+harbor::job_logger:
+  - STD_OUTPUT
+  - FILE
 harbor::logger_sweeper_duration: 1
 harbor::customize_crt: 'on'
 harbor::ssl_cert: '/data/cert/server.crt'
@@ -43,10 +46,13 @@ harbor::redis_password: ''
 harbor::redis_registry_db_index: 1
 harbor::redis_jobservice_db_index: 2
 harbor::redis_trivy_db_index: 5
+harbor::redis_harbor_db_index: ~
+harbor::redis_cache_layer_db_index: ~
 harbor::trivy_ignore_unfixed: false
 harbor::trivy_skip_update: false
 harbor::trivy_offline_scan: false
 harbor::trivy_insecure: false
+harbor::trivy_timeout: '5m0s'
 harbor::uaa_ca_cert: ''
 harbor::registry_storage_provider_name: 'filesystem'
 harbor::registry_storage_provider_config: ''
@@ -63,5 +69,6 @@ harbor::upload_purging_interval: 24h
 harbor::upload_purging_dryrun: false
 harbor::cache_enabled: false
 harbor::cache_expire_hours: 24
+harbor::quota_update_provider: db
 harbor::backup_enabled: false
 harbor::backup_directory: '/tmp'
