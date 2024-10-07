@@ -414,9 +414,8 @@ class harbor (
   contain 'harbor::prepare'
 
   class { 'harbor::service':
-    cfg_version          => $_cfg_version,
-    with_notary          => $with_notary,
-    compose_install_path => $docker::compose::install_path,
+    cfg_version => $_cfg_version,
+    with_notary => $with_notary,
   }
   contain 'harbor::service'
 

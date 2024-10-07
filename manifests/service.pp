@@ -3,7 +3,6 @@
 class harbor::service (
   $cfg_version,
   $with_notary,
-  $compose_install_path,
 ){
 
   assert_private()
@@ -24,8 +23,7 @@ class harbor::service (
     group   => 'root',
     mode    => '0644',
     content => epp('harbor/harbor.service.epp', {
-      'compose_install_path' => $compose_install_path,
-      'compose_files'        => $_compose_files,
+        'compose_files' => $_compose_files,
     }),
     notify  => Exec['harbor_systemd_daemon-reload'],
   }

@@ -47,7 +47,7 @@ describe 'harbor' do
       describe 'harbor::service' do
         context 'with init default params' do
           it do
-            is_expected.to contain_file('harbor_service_unit').with_content(%r{ExecStart=/usr/local/bin/docker-compose -f /opt/harbor/docker-compose.yml up --remove-orphans})
+            is_expected.to contain_file('harbor_service_unit').with_content(%r{ExecStart=/usr/bin/docker compose -f /opt/harbor/docker-compose.yml up --remove-orphans})
             is_expected.to contain_service('harbor')
           end
         end
