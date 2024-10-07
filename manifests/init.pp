@@ -217,7 +217,7 @@ class harbor (
   Stdlib::Host $hostname,
   Enum['http','https'] $ui_url_protocol,
   Integer $max_job_workers,
-  Enum['STD_OUTPUT', 'FILE', 'DB'] $job_logger,
+  Array[Enum['STD_OUTPUT', 'FILE', 'DB']] $job_logger,
   Integer $logger_sweeper_duration,
   Enum['on','off'] $customize_crt,
   Stdlib::Absolutepath $ssl_cert,
