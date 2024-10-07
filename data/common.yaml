@@ -8,7 +8,7 @@ harbor::with_trivy: false
 harbor::hostname: "%{facts.fqdn}"
 harbor::ui_url_protocol: 'http'
 harbor::max_job_workers: 10
-harbor::job_logger:
+harbor::job_loggers:
   - STD_OUTPUT
   - FILE
 harbor::logger_sweeper_duration: 1

@@ -3,7 +3,7 @@
   $hostname,
   $ui_url_protocol,
   $max_job_workers,
-  $job_logger,
+  $job_loggers,
   $logger_sweeper_duration,
   $customize_crt,
   $ssl_cert,
