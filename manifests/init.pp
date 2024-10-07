@@ -40,7 +40,7 @@
 #   The maximum number of replication workers in job service
 #   Defaults to 10
 #
-# @param job_logger
+# @param job_loggers
 #
 # @param logger_sweeper_duration
 #   The jobLogger sweeper duration
@@ -217,7 +217,7 @@ class harbor (
   Stdlib::Host $hostname,
   Enum['http','https'] $ui_url_protocol,
   Integer $max_job_workers,
-  Array[Enum['STD_OUTPUT', 'FILE', 'DB']] $job_logger,
+  Array[Enum['STD_OUTPUT', 'FILE', 'DB']] $job_loggers,
   Integer $logger_sweeper_duration,
   Enum['on','off'] $customize_crt,
   Stdlib::Absolutepath $ssl_cert,
@@ -343,7 +343,7 @@ class harbor (
     hostname                         => $hostname,
     ui_url_protocol                  => $ui_url_protocol,
     max_job_workers                  => $max_job_workers,
-    job_logger                       => $job_logger,
+    job_loggers                      => $job_loggers,
     logger_sweeper_duration          => $logger_sweeper_duration,
     customize_crt                    => $customize_crt,
     ssl_cert                         => $ssl_cert,
