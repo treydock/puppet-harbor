@@ -1,13 +1,13 @@
 ---
-harbor::version: '2.8.2'
-harbor::release: '2.8.0'
-harbor::checksum: 'dadf773143dcdcfa05a54a8826835d6d'
+harbor::version: '2.15.1'
+harbor::checksum: '4fa99304a404ba06c18424862ff37ffc'
 harbor::installer: 'offline'
 harbor::with_notary: false
 harbor::with_trivy: false
 harbor::hostname: "%{facts.fqdn}"
 harbor::ui_url_protocol: 'http'
 harbor::max_job_workers: 10
+harbor::max_job_duration_hours: 24
 harbor::job_loggers:
   - STD_OUTPUT
   - FILE
@@ -50,7 +50,12 @@ harbor::redis_harbor_db_index: ~
 harbor::redis_cache_layer_db_index: ~
 harbor::trivy_ignore_unfixed: false
 harbor::trivy_skip_update: false
+harbor::trivy_skip_java_db_update: false
+harbor::trivy_db_repository: ghcr.io/aquasecurity/trivy-db
+harbor::trivy_java_db_repository: ghcr.io/aquasecurity/trivy-java-db
 harbor::trivy_offline_scan: false
+harbor::trivy_security_check:
+  - vuln
 harbor::trivy_insecure: false
 harbor::trivy_timeout: '5m0s'
 harbor::uaa_ca_cert: ''
@@ -59,7 +64,7 @@ harbor::registry_storage_provider_config: ''
 harbor::registry_custom_ca_bundle: ''
 harbor::reload_config: ''
 harbor::skip_reload_env_pattern: ''
-harbor::webhook_job_max_retry: 10
+harbor::webhook_job_max_retry: 3
 harbor::metrics: false
 harbor::metrics_port: 9090
 harbor::metrics_path: /metrics

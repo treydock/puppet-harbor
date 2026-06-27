@@ -3,6 +3,7 @@
   $hostname,
   $ui_url_protocol,
   $max_job_workers,
+  $max_job_duration_hours,
   $job_loggers,
   $logger_sweeper_duration,
   $customize_crt,
@@ -42,7 +43,11 @@
   $redis_cache_layer_db_index,
   $trivy_ignore_unfixed,
   $trivy_skip_update,
+  $trivy_skip_java_db_update,
+  $trivy_db_repository,
+  $trivy_java_db_repository,
   $trivy_offline_scan,
+  $trivy_security_check,
   $trivy_insecure,
   $trivy_timeout,
   $trivy_github_token,
@@ -83,7 +88,19 @@ https:
   # The path of cert and key files for nginx
   certificate: <%= $ssl_cert %>
   private_key: <%= $ssl_cert_key %>
+  # enable strong ssl ciphers (default: false)
+  strong_ssl_ciphers: false
 <% } %>
+
+# # Harbor will set ipv4 enabled only by default if this block is not configured
+# # Otherwise, please uncomment this block to configure your own ip_family stacks
+# ip_family:
+#   # ipv6Enabled set to true if ipv6 is enabled in docker network, currently it affected the nginx related component
+#   ipv6:
+#     enabled: false
+#   # ipv4Enabled set to true by default, currently it affected the nginx related component
+#   ipv4:
+#     enabled: true
 
 <%- if $internal_tls { -%>
 # # Uncomment following will enable tls communication between all harbor components
@@ -107,12 +124,12 @@ harbor_admin_password: <%= $harbor_admin_password %>
 
 # Harbor DB configuration
 database:
-  # The password for the root user of Harbor DB. Change this before any production use.
+  # The password for the user('postgres' by default) of Harbor DB. Change this before any production use.
   password: <%= $db_password %>
   # The maximum number of connections in the idle connection pool. If it <=0, no idle connections are retained.
   max_idle_conns: <%= $db_max_idle_connections %>
   # The maximum number of open connections to the database. If it <= 0, then there is no limit on the number of open connections.
-  # Note: the default number of connections is 100 for postgres.
+  # Note: the default number of connections is 1024 for postgres of harbor.
   max_open_conns: <%= $db_max_open_conns %>
   # The maximum amount of time a connection may be reused. Expired connections may be closed lazily before reuse. If it <= 0, connections are not closed due to a connection's age.
   # The value is a duration string. A duration string is a possibly signed sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
@@ -156,6 +173,15 @@ trivy:
   # `metadata.json` files and mount them in the `/home/scanner/.cache/trivy/db` path.
   skip_update: <%= $trivy_skip_update %>
   #
+  # skipJavaDBUpdate If the flag is enabled you have to manually download the `trivy-java.db` file and mount it in the
+  # `/home/scanner/.cache/trivy/java-db/trivy-java.db` path
+  skip_java_db_update: <%= $trivy_skip_java_db_update %>
+  #
+  # OCI repository to retrieve the trivy vulnerability database from.
+  db_repository: <%= $trivy_db_repository %>
+  # OCI repository to retrieve the Java trivy vulnerability database from.
+  java_db_repository: <%= $trivy_java_db_repository %>
+  #
   # The offline_scan option prevents Trivy from sending API requests to identify dependencies.
   # Scanning JAR files and pom.xml may require Internet access for better detection, but this option tries to avoid it.
   # For example, the offline mode will not try to resolve transitive dependencies in pom.xml when the dependency doesn't
@@ -164,8 +190,12 @@ trivy:
   # This option doesn't affect DB download. You need to specify "skip-update" as well as "offline-scan" in an air-gapped environment.
   offline_scan: <%= $trivy_offline_scan %>
   #
+  # Comma-separated list of what security issues to detect. Possible values are `vuln`, `config` and `secret`. Defaults to `vuln`.
+  security_check: <%= join($trivy_security_check, ',') %>
+  #
   # insecure The flag to skip verifying registry certificate
   insecure: <%= $trivy_insecure %>
+  #
   # timeout The duration to wait for scan completion.
   # There is upper bound of 30 minutes defined in scan job. So if this `timeout` is larger than 30m0s, it will also timeout at 30m0s.
   timeout: <%= $trivy_timeout %>
@@ -187,6 +217,8 @@ trivy:
 jobservice:
   # Maximum number of job workers in job service  
   max_job_workers: <%= $max_job_workers %>
+  # Maximum hours of task duration in job service, default 24
+  max_job_duration_hours: <%= $max_job_duration_hours %>
   # The jobLoggers backend name, only support "STD_OUTPUT", "FILE" and/or "DB"
   job_loggers:
   <%- $job_loggers.each |$job_logger| { -%>
@@ -230,10 +262,7 @@ log:
 #This attribute is for migrator to detect the version of the .cfg file, DO NOT MODIFY!
 _version: <%= $cfg_version %>
 
-# Uncomment external_database if using external database. Currently only support POSTGRES. 
-# Four databases are needed to be create first by users for Harbor core, Clair, Notary server 
-# and Notary signer. And the tables will be generated automatically when Harbor starting up.
-# NOTE: external_database is unable to custom attributes individually, you must do them in block.
+# Uncomment external_database if using external database.
 # external_database:
 #   harbor:
 #     host: harbor_db_host
@@ -241,20 +270,6 @@ _version: <%= $cfg_version %>
 #     db_name: harbor_db_name
 #     username: harbor_db_username
 #     password: harbor_db_password
-#     ssl_mode: disable
-#   notary_signer:
-#     host: notary_signer_db_host
-#     port: notary_signer_db_port
-#     db_name: notary_signer_db_name
-#     username: notary_signer_db_username
-#     password: notary_signer_db_password
-#     ssl_mode: disable
-#   notary_server:
-#     host: notary_server_db_host
-#     port: notary_server_db_port
-#     db_name: notary_server_db_name
-#     username: notary_server_db_username
-#     password: notary_server_db_password
 #     ssl_mode: disable
 
 <% if $external_redis == 'true' { -%>
@@ -327,7 +342,7 @@ metric:
 #   enabled: true
 #   # set sample_rate to 1 if you wanna sampling 100% of trace data; set 0.5 if you wanna sampling 50% of trace data, and so forth
 #   sample_rate: 1
-#   # # namespace used to differenciate different harbor services
+#   # # namespace used to differentiate different harbor services
 #   # namespace:
 #   # # attributes is a key value dict contains user defined attributes used to initialize trace provider
 #   # attributes:
@@ -345,7 +360,8 @@ metric:
 #   #   url_path: /v1/traces
 #   #   compression: false
 #   #   insecure: true
-#   #   timeout: 10s
+#   #   # timeout is in seconds
+#   #   timeout: 10
 
 # Enable purge _upload directories
 upload_purging:

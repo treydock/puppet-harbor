@@ -40,6 +40,8 @@
 #   The maximum number of replication workers in job service
 #   Defaults to 10
 #
+# @param max_job_duration_hours
+#
 # @param job_loggers
 #
 # @param logger_sweeper_duration
@@ -154,7 +156,15 @@
 #
 # @param trivy_skip_update
 #
+# @param trivy_skip_java_db_update
+#
+# @param trivy_db_repository
+#
+# @param trivy_java_db_repository
+#
 # @param trivy_offline_scan
+#
+# @param trivy_security_check
 #
 # @param trivy_insecure
 #
@@ -217,6 +227,7 @@ class harbor (
   Stdlib::Host $hostname,
   Enum['http','https'] $ui_url_protocol,
   Integer $max_job_workers,
+  Integer $max_job_duration_hours,
   Array[Enum['STD_OUTPUT', 'FILE', 'DB']] $job_loggers,
   Integer $logger_sweeper_duration,
   Enum['on','off'] $customize_crt,
@@ -256,7 +267,11 @@ class harbor (
   Optional[Integer] $redis_cache_layer_db_index,
   Boolean $trivy_ignore_unfixed,
   Boolean $trivy_skip_update,
+  Boolean $trivy_skip_java_db_update,
+  String $trivy_db_repository,
+  String $trivy_java_db_repository,
   Boolean $trivy_offline_scan,
+  Array[Enum['vuln', 'config', 'secret']] $trivy_security_check,
   Boolean $trivy_insecure,
   String $trivy_timeout,
   String $uaa_ca_cert,
@@ -343,6 +358,7 @@ class harbor (
     hostname                         => $hostname,
     ui_url_protocol                  => $ui_url_protocol,
     max_job_workers                  => $max_job_workers,
+    max_job_duration_hours           => $max_job_duration_hours,
     job_loggers                      => $job_loggers,
     logger_sweeper_duration          => $logger_sweeper_duration,
     customize_crt                    => $customize_crt,
@@ -382,7 +398,11 @@ class harbor (
     redis_cache_layer_db_index       => $redis_cache_layer_db_index,
     trivy_ignore_unfixed             => $trivy_ignore_unfixed,
     trivy_skip_update                => $trivy_skip_update,
+    trivy_skip_java_db_update        => $trivy_skip_java_db_update,
+    trivy_db_repository              => $trivy_db_repository,
+    trivy_java_db_repository         => $trivy_java_db_repository,
     trivy_offline_scan               => $trivy_offline_scan,
+    trivy_security_check             => $trivy_security_check,
     trivy_insecure                   => $trivy_insecure,
     trivy_timeout                    => $trivy_timeout,
     trivy_github_token               => $trivy_github_token,
