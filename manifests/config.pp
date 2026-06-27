@@ -156,14 +156,14 @@ class harbor::config (
     show_diff => false,
   }
 
-  $migrate_command = versioncmp($harbor::version, '2.0.0') < 0 ? {
-    true    => "/usr/bin/docker run --rm -v harbor.yml:/harbor-migration/harbor-cfg/harbor.yml -v harbor.yml:/harbor-migration/harbor-cfg-out/harbor.yml goharbor/harbor-migrator:v${cfg_version} --cfg up",
-    default => "/usr/bin/docker run --rm -v /:/hostfs goharbor/prepare:v${harbor::version} migrate -i /opt/harbor-v${harbor::version}/harbor/harbor.yml",
-  }
-
+  $migrate_cmd = [
+    '/usr/bin/docker run --rm',
+    "-v /:/hostfs goharbor/prepare:v${harbor::version}",
+    "migrate -i /opt/harbor-v${harbor::version}/harbor/harbor.yml",
+  ]
   exec { 'migrate_cfg':
     cwd         => '/opt/harbor',
-    command     => $migrate_command,
+    command     => $migrate_cmd.join(' '),
     environment => ['HOME=/root'],
     logoutput   => true,
     refreshonly => true,

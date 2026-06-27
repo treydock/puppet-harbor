@@ -13,10 +13,6 @@
 # @param installer
 #   Specifies which installer type to use. Note that not every release has both installer types available.
 #
-# @param with_notary
-#   Specifies whether to include Notary functionality in the deployment.
-#   Defaults to false
-#
 # @param with_trivy
 #   Specifies whether to include Trivy functionality in the deployment.
 #   Defaults to false
@@ -222,7 +218,6 @@ class harbor (
   Enum['offline','online'] $installer,
   String  $checksum,
   Boolean $external_redis,
-  Boolean $with_notary,
   Boolean $with_trivy,
   Stdlib::Host $hostname,
   Enum['http','https'] $ui_url_protocol,
@@ -427,15 +422,13 @@ class harbor (
   contain 'harbor::config'
 
   class { 'harbor::prepare':
-    version     => $version,
-    with_notary => $with_notary,
-    with_trivy  => $with_trivy,
+    version    => $version,
+    with_trivy => $with_trivy,
   }
   contain 'harbor::prepare'
 
   class { 'harbor::service':
     cfg_version => $_cfg_version,
-    with_notary => $with_notary,
   }
   contain 'harbor::service'
 
@@ -445,5 +438,4 @@ class harbor (
   ~> Class['harbor::config']
   ~> Class['harbor::prepare']
   ~> Class['harbor::service']
-
 }

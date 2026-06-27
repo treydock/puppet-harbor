@@ -2,7 +2,6 @@
 harbor::version: '2.15.1'
 harbor::checksum: '4fa99304a404ba06c18424862ff37ffc'
 harbor::installer: 'offline'
-harbor::with_notary: false
 harbor::with_trivy: false
 harbor::hostname: "%{facts.fqdn}"
 harbor::ui_url_protocol: 'http'

@@ -2,19 +2,10 @@
 # @summary Sets up a systemd unit file and service for Harbor
 class harbor::service (
   $cfg_version,
-  $with_notary,
 ){
-
   assert_private()
 
-  $_default_ompose_files = '-f /opt/harbor/docker-compose.yml'
-  if $with_notary {
-    $_optional_compose_files = ' -f /opt/harbor/docker-compose.notary.yml'
-  } else {
-    $_optional_compose_files = ''
-  }
-
-  $_compose_files = "${_default_ompose_files}${_optional_compose_files}"
+  $_compose_files = '-f /opt/harbor/docker-compose.yml'
 
   file { 'harbor_service_unit':
     ensure  => file,
@@ -39,5 +30,4 @@ class harbor::service (
     enable    => true,
     subscribe => Exec['harbor_systemd_daemon-reload'],
   }
-
 }

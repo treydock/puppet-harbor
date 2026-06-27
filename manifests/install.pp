@@ -7,14 +7,13 @@ class harbor::install (
   $download_source,
   $proxy_server = undef,
 ){
-
   assert_private()
 
   file { "/opt/harbor-v${version}":
     ensure => directory,
     owner  => 'root',
     group  => 'root',
-    mode   =>  '0755',
+    mode   => '0755',
   }
 
   archive { "/tmp/harbor-${installer}-installer-v${version}.tgz":
@@ -47,5 +46,4 @@ class harbor::install (
       subscribe  => File['/opt/harbor'],
     }
   }
-
 }

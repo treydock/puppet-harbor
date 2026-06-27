@@ -2,14 +2,12 @@
 # @summary Runs the Harbor prepare script
 class harbor::prepare (
   $version,
-  $with_notary,
   $with_trivy,
 ){
 
   assert_private()
 
   $opts_hash = {
-    '--with-notary'      => $with_notary,
     '--with-trivy'       => $with_trivy,
   }.filter |$key, $value| { $value }
 
